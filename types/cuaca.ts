@@ -12,3 +12,11 @@ export interface WeatherCardProps {
   suhu: number;
   tingkatAQI: TingkatAQI;
 }
+
+// Tambahan baru untuk Tahap 5 (Latihan Mandiri)
+export interface LaporanUdara {
+  kota: string;
+  indeksAQI: number;
+  tingkat: TingkatAQI;
+  diperbaruiPada?: string;
+}

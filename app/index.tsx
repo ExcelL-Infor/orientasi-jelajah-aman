@@ -1,4 +1,3 @@
-// app/index.tsx
 import { View } from "react-native";
 import { useState, useEffect } from "react";
 
@@ -10,7 +9,6 @@ export default function HalamanUtama() {
   const [kotaAktif, setKotaAktif] = useState("Pekalongan");
   const [riwayat, setRiwayat] = useState<string[]>(["Pekalongan"]);
 
-  // Tambahkan useEffect untuk mencatat perubahan kota aktif
   useEffect(() => {
     console.log("Kota aktif berubah menjadi:", kotaAktif);
   }, [kotaAktif]);
