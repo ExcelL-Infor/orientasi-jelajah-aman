@@ -1,4 +1,4 @@
-//app/(tabs)/index.tsx
+// app/(tabs)/index.tsx
 import { useState, useEffect } from "react";
 import { View, Text, ActivityIndicator, Button } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,7 +14,8 @@ export default function HalamanUtama() {
   const [sedangMemuat, setSedangMemuat] = useState(false);
   const [pesanError, setPesanError] = useState<string | null>(null);
   
-  const teksTertunda = useDebounce(teksCari, 500);
+  // Latihan Mandiri 2: Ubah delay debounce menjadi 800
+  const teksTertunda = useDebounce(teksCari, 800);
   
   useEffect(() => {
     if (teksTertunda.trim().length === 0) {
@@ -46,15 +47,22 @@ export default function HalamanUtama() {
       
       {pesanError && (
         <View>
-          <Text>{pesanError}</Text>
+          {/* Latihan Mandiri 3: Tambahkan accessibilityLabel pada pesan error */}
+          <Text accessibilityLabel={`Pesan error: ${pesanError}`}>{pesanError}</Text>
           <Button title="Coba Lagi" onPress={() => ambilData(teksTertunda)} />
         </View>
       )}
       
+      {/* Latihan Mandiri 3: Tambahkan accessibilityLabel pada pesan kosong */}
       {!sedangMemuat && !pesanError && teksTertunda.length > 0 && hasil.length === 0 && (
-        <Text>Kota tidak ditemukan</Text>
+        <Text accessibilityLabel="Informasi: Kota tidak ditemukan">Kota tidak ditemukan</Text>
       )}
       
+      {/* Latihan Mandiri 1: Tambahkan indikator jumlah hasil */}
+      {!sedangMemuat && !pesanError && hasil.length > 0 && (
+        <Text>Ditemukan {hasil.length} kota</Text>
+      )}
+
       {hasil.map((kota) => (
         <WeatherCard key={kota.id} kota={kota.name} suhu={29} tingkatAQI="BAIK" />
       ))}
