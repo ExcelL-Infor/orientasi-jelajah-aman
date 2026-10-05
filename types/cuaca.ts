@@ -11,6 +11,7 @@ export interface WeatherCardProps {
   kota: string;
   suhu: number;
   tingkatAQI: TingkatAQI;
+  indeksAQI?: number; // baru: angka asli dari API, opsional
 }
 
 // Tambahan baru untuk Tahap 5 (Latihan Mandiri)
