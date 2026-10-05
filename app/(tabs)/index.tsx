@@ -73,20 +73,44 @@ export default function HalamanUtama() {
                     />
                 </View>
             )}
+            
             {cuaca && kualitasUdara && kotaTerpilih && !sedangMemuat && (
-                <WeatherCard
-                    kota={kotaTerpilih.name}
-                    suhu={cuaca.saatIni.suhu}
-                    tingkatAQI={konversiTingkatAQI(kualitasUdara.indeksAQI)}
-                    indeksAQI={kualitasUdara.indeksAQI}
-                />
+                <View>
+                    <WeatherCard
+                        kota={kotaTerpilih.name}
+                        suhu={cuaca.saatIni.suhu}
+                        tingkatAQI={konversiTingkatAQI(kualitasUdara.indeksAQI)}
+                        indeksAQI={kualitasUdara.indeksAQI}
+                    />
+                    {/* 1. Latihan Mandiri: Menambahkan Suhu Maksimal & Minimal */}
+                    <Text style={{ textAlign: "center", marginTop: 8, fontSize: 14, fontWeight: "500" }}>
+                        Suhu Hari Ini: Min {cuaca.harian.suhuMinimal[0]}°C | Maks {cuaca.harian.suhuMaksimal[0]}°C
+                    </Text>
+                </View>
             )}
+
             {cuaca && (
-                <Text style={{ fontSize: 12, color: "#888" }}>
-                    Kondisi: {labelKodeCuaca(cuaca.saatIni.kodeCuaca)} Angin {cuaca.saatIni.kecepatanAngin} km/j
+                <Text style={{ fontSize: 12, color: "#888", textAlign: "center" }}>
+                    Kondisi: {labelKodeCuaca(cuaca.saatIni.kodeCuaca)} | Angin {cuaca.saatIni.kecepatanAngin} km/j
                 </Text>
             )}
-            <AtribusiCuaca />
+
+            {/* 2. Latihan Mandiri: Menambahkan Data PM2.5 dan PM10 di atas Atribusi */}
+            {kualitasUdara && (
+                <View style={{ marginTop: "auto" }}>
+                    <Text style={{ fontSize: 11, color: "#888", textAlign: "center", marginBottom: 4 }}>
+                        Detail Polusi Udara: PM2.5 ({kualitasUdara.pm25}) | PM10 ({kualitasUdara.pm10})
+                    </Text>
+                    <AtribusiCuaca />
+                </View>
+            )}
+            
+            {/* Tampilkan atribusi jika belum ada pencarian agar tidak hilang */}
+            {!kualitasUdara && (
+                <View style={{ marginTop: "auto" }}>
+                    <AtribusiCuaca />
+                </View>
+            )}
         </SafeAreaView>
     );
 }
