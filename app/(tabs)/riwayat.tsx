@@ -1,6 +1,7 @@
-//src/app/(tabs)/riwayat.tsx
+// src/app/(tabs)/riwayat.tsx
 import { useState, useCallback } from "react";
-import { View, Text, Button } from "react-native";
+// Latihan Mandiri 1: Tambahkan Alert ke dalam import
+import { View, Text, Button, Alert } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ambilSemuaFavorit, hapusFavorit } from "../../services/favoritStorage";
@@ -20,17 +21,37 @@ export default function TabRiwayat() {
     setDaftarFavorit((prev) => prev.filter((k) => k.id !== id));
   }
 
+  // Latihan Mandiri 1: Fungsi untuk memunculkan konfirmasi dialog
+  function konfirmasiHapus(kota: KotaFavorit) {
+    Alert.alert(
+      "Konfirmasi Hapus",
+      `Yakin hapus ${kota.nama}?`,
+      [
+        { text: "Batal", style: "cancel" },
+        { text: "Hapus", style: "destructive", onPress: () => hapus(kota.id) },
+      ]
+    );
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, padding: 16, gap: 12 }}>
       <Text style={{ fontSize: 18, fontWeight: "bold" }}>Kota Favorit</Text>
+      
+      {/* Latihan Mandiri 2: Tampilkan jumlah favorit */}
+      <Text style={{ fontStyle: "italic", color: "gray" }}>
+        Tersimpan {daftarFavorit.length} kota
+      </Text>
+
       {daftarFavorit.length === 0 && <Text>Belum ada kota favorit</Text>}
+      
       {daftarFavorit.map((kota) => (
         <View
           key={kota.id}
           style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
         >
           <Text>{kota.nama}</Text>
-          <Button title="Hapus" onPress={() => hapus(kota.id)} />
+          {/* Ubah onPress agar memanggil konfirmasiHapus, bukan hapus langsung */}
+          <Button title="Hapus" onPress={() => konfirmasiHapus(kota)} color="red" />
         </View>
       ))}
     </SafeAreaView>

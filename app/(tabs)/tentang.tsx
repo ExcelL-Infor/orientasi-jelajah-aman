@@ -16,7 +16,7 @@ export default function TabTentang() {
         Versi 1.0.0
       </Text>
       <Text style={{ fontSize: typeScale.isi }}>
-        Dibuat oleh: Nama Kamu Disini
+        Dibuat oleh: Andika Faza Setiawan
       </Text>
     </SafeAreaView>
   );

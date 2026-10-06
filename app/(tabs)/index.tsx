@@ -1,5 +1,5 @@
-//src/app/(tabs)/index.tsx
-import { useState, useEffect, useRef } from "react";
+//app/(tabs)/index.tsx
+import { useState, useEffect, useRef,useCallback } from "react";
 import { View, Text, ActivityIndicator, Button, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchBox from "../../components/SearchBox";
@@ -15,6 +15,8 @@ import { HasilGeocoding } from "../../types/geocoding";
 import { DataCuacaLengkap, DataKualitasUdara } from "../../types/weather";
 import { mintaIzinLokasi, ambilKoordinatSaatIni } from "../../services/locationService";
 import { router } from "expo-router";
+import { useFocusEffect } from "expo-router";
+import { ambilSemuaFavorit } from "../../services/favoritStorage";
 
 export default function HalamanUtama() {
     const [teksCari, setTeksCari] = useState("");
@@ -28,6 +30,20 @@ export default function HalamanUtama() {
     const requestIdRef = useRef(0);
     const [pesanLokasi, setPesanLokasi] = useState<string | null>(null);
 
+    // Latihan Mandiri 3: State untuk mengecek apakah kota sudah jadi favorit
+  const [isFavorit, setIsFavorit] = useState(false);
+
+    useFocusEffect(
+        useCallback(() => {
+        if (kotaTerpilih) {
+            ambilSemuaFavorit().then((daftar) => {
+            // Mengecek apakah kotaTerpilih.id ada di dalam daftar penyimpanan
+            const sudahAda = daftar.some((k) => k.id === kotaTerpilih.id);
+            setIsFavorit(sudahAda);
+            });
+        }
+        }, [kotaTerpilih])
+    );
     useEffect(() => {
         if (teksTertunda.trim().length === 0) {
             setHasilPencarian([]);
@@ -116,10 +132,12 @@ export default function HalamanUtama() {
                         Suhu Hari Ini: Min {cuaca.harian.suhuMinimal[0]}°C | Maks {cuaca.harian.suhuMaksimal[0]}°C
                     </Text>
                     {/* TOMBOL FAVORIT DITAMBAHKAN DI SINI */}
+                    {/* Latihan Mandiri 3: Nonaktifkan (disable) tombol jika sudah favorit */}
                     <Button
-                        title="Tambahkan ke Favorit"
+                        title={isFavorit ? "Sudah jadi Favorit" : "Tambahkan ke Favorit"}
+                        disabled={isFavorit}
                         onPress={() =>
-                        router.push({
+                            router.push({
                             pathname: "/tambah-favorit",
                             params: {
                                 id: String(kotaTerpilih.id),
