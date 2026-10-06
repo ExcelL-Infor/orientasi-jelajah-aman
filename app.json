@@ -21,7 +21,18 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      {
+"expo": {
+  "plugins": [
+    [
+      "expo-location",
+      {
+        "locationWhenInUsePermission": "Jelajah Aman menggunakan lokasi Anda untuk menampilkan cuaca di kota terdekat."
+      }
+    ]
+  ]
+}
+}
     ]
   }
 }
