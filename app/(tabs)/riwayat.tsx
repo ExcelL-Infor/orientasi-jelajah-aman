@@ -1,7 +1,7 @@
 // src/app/(tabs)/riwayat.tsx
 import { useState, useCallback } from "react";
-// Latihan Mandiri 1: Tambahkan Alert ke dalam import
-import { View, Text, Button, Alert } from "react-native";
+// Tambahkan Platform ke dalam import, biarkan Alert tetap ada
+import { View, Text, Button, Alert, Platform } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ambilSemuaFavorit, hapusFavorit } from "../../services/favoritStorage";
@@ -21,16 +21,23 @@ export default function TabRiwayat() {
     setDaftarFavorit((prev) => prev.filter((k) => k.id !== id));
   }
 
-  // Latihan Mandiri 1: Fungsi untuk memunculkan konfirmasi dialog
+  // Latihan Mandiri 1: Fungsi untuk memunculkan konfirmasi dialog dengan dukungan Web
   function konfirmasiHapus(kota: KotaFavorit) {
-    Alert.alert(
-      "Konfirmasi Hapus",
-      `Yakin hapus ${kota.nama}?`,
-      [
-        { text: "Batal", style: "cancel" },
-        { text: "Hapus", style: "destructive", onPress: () => hapus(kota.id) },
-      ]
-    );
+    if (Platform.OS === "web") {
+      const yakin = window.confirm(`Yakin hapus ${kota.nama}?`);
+      if (yakin) {
+        hapus(kota.id);
+      }
+    } else {
+      Alert.alert(
+        "Konfirmasi Hapus",
+        `Yakin hapus ${kota.nama}?`,
+        [
+          { text: "Batal", style: "cancel" },
+          { text: "Hapus", style: "destructive", onPress: () => hapus(kota.id) },
+        ]
+      );
+    }
   }
 
   return (
