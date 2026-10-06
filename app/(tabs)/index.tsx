@@ -14,6 +14,7 @@ import { labelKodeCuaca } from "../../constants/weatherCodes";
 import { HasilGeocoding } from "../../types/geocoding";
 import { DataCuacaLengkap, DataKualitasUdara } from "../../types/weather";
 import { mintaIzinLokasi, ambilKoordinatSaatIni } from "../../services/locationService";
+import { router } from "expo-router";
 
 export default function HalamanUtama() {
     const [teksCari, setTeksCari] = useState("");
@@ -114,6 +115,21 @@ export default function HalamanUtama() {
                     <Text style={{ textAlign: "center", marginTop: 8, fontSize: 14, fontWeight: "500" }}>
                         Suhu Hari Ini: Min {cuaca.harian.suhuMinimal[0]}°C | Maks {cuaca.harian.suhuMaksimal[0]}°C
                     </Text>
+                    {/* TOMBOL FAVORIT DITAMBAHKAN DI SINI */}
+                    <Button
+                        title="Tambahkan ke Favorit"
+                        onPress={() =>
+                        router.push({
+                            pathname: "/tambah-favorit",
+                            params: {
+                                id: String(kotaTerpilih.id),
+                                nama: kotaTerpilih.name,
+                                lat: String(kotaTerpilih.latitude),
+                                lon: String(kotaTerpilih.longitude),
+                                },
+                            })
+                        }
+                    />
                 </View>
             )}
 
