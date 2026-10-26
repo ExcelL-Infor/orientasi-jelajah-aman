@@ -1,14 +1,21 @@
-// app/(tabs)/_layout.tsx
+// src/app/(tabs)/_layout.tsx
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function TabLayout() {
+  const { themeColors, isDark } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#0284c7",
-        tabBarInactiveTintColor: "#64748b",
+        tabBarActiveTintColor: themeColors.primary,
+        tabBarInactiveTintColor: themeColors.subtext,
+        tabBarStyle: {
+          backgroundColor: themeColors.cardBg,
+          borderTopColor: themeColors.border,
+        },
       }}
     >
       <Tabs.Screen
@@ -23,7 +30,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="riwayat"
         options={{
-          title: "Riwayat & Favorit",
+          title: "Riwayat & Cache",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="time-outline" size={size} color={color} />
           ),
