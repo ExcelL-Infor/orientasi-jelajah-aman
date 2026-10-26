@@ -98,3 +98,9 @@ export async function hapusSemuaCache(): Promise<void> {
   const db = await ambilDatabase();
   await db.runAsync(`DELETE FROM cache_cuaca`);
 }
+
+// Tambahan untuk UTS: Hapus cache spesifik berdasarkan kunci unik kota[cite: 28]
+export async function hapusCacheSpesifik(kunci: string): Promise<void> {
+  const db = await ambilDatabase();
+  await db.runAsync(`DELETE FROM cache_cuaca WHERE kunci = ?`, [kunci]);
+}

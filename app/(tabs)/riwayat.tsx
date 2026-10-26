@@ -1,66 +1,124 @@
 // src/app/(tabs)/riwayat.tsx
 import { useState, useCallback } from "react";
-// Tambahkan Platform ke dalam import, biarkan Alert tetap ada
-import { View, Text, Button, Alert, Platform } from "react-native";
-import { useFocusEffect } from "expo-router";
+import { View, Text, Button, Alert, Platform, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import { useFocusEffect, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ambilSemuaFavorit, hapusFavorit } from "../../services/favoritStorage";
-import { KotaFavorit } from "../../types/favorit";
+import { Ionicons } from "@expo/vector-icons";
+import { daftarKotaTersimpan, hapusCacheSpesifik } from "../../services/cacheRepository";
+import { RingkasanKotaTersimpan } from "../../types/cache";
 
 export default function TabRiwayat() {
-  const [daftarFavorit, setDaftarFavorit] = useState<KotaFavorit[]>([]);
+  const [daftarKota, setDaftarKota] = useState<RingkasanKotaTersimpan[]>([]);
+
+  const muatData = async () => {
+    const data = await daftarKotaTersimpan();
+    setDaftarKota(data);
+  };
 
   useFocusEffect(
     useCallback(() => {
-      ambilSemuaFavorit().then(setDaftarFavorit);
+      muatData();
     }, [])
   );
 
-  async function hapus(id: number) {
-    await hapusFavorit(id);
-    setDaftarFavorit((prev) => prev.filter((k) => k.id !== id));
+  async function hapus(kunci: string) {
+    await hapusCacheSpesifik(kunci);
+    setDaftarKota((prev) => prev.filter((k) => k.kunci !== kunci));
   }
 
-  // Latihan Mandiri 1: Fungsi untuk memunculkan konfirmasi dialog dengan dukungan Web
-  function konfirmasiHapus(kota: KotaFavorit) {
+  // Fungsi konfirmasi hapus dengan dukungan multi-platform (Web & Mobile)
+  function konfirmasiHapus(item: RingkasanKotaTersimpan) {
     if (Platform.OS === "web") {
-      const yakin = window.confirm(`Yakin hapus ${kota.nama}?`);
+      const yakin = window.confirm(`Apakah Anda yakin ingin menghapus cache data cuaca untuk ${item.nama}?`);
       if (yakin) {
-        hapus(kota.id);
+        hapus(item.kunci);
       }
     } else {
       Alert.alert(
-        "Konfirmasi Hapus",
-        `Yakin hapus ${kota.nama}?`,
+        "Hapus Cache Kota",
+        `Apakah Anda yakin ingin menghapus cache data cuaca untuk ${item.nama}?`,
         [
           { text: "Batal", style: "cancel" },
-          { text: "Hapus", style: "destructive", onPress: () => hapus(kota.id) },
+          {
+            text: "Hapus",
+            style: "destructive",
+            onPress: () => hapus(item.kunci),
+          },
         ]
       );
     }
   }
 
+  // Fungsi saat item kota diklik untuk membukanya kembali di Beranda
+  const bukaKota = (kota: RingkasanKotaTersimpan) => {
+    router.push({
+      pathname: "/",
+      params: {
+        lat: String(kota.latitude),
+        lon: String(kota.longitude),
+        nama: kota.nama,
+      },
+    });
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1, padding: 16, gap: 12 }}>
-      <Text style={{ fontSize: 18, fontWeight: "bold" }}>Kota Favorit</Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.judul}>Riwayat & Cache Kota Tersimpan</Text>
       
-      {/* Latihan Mandiri 2: Tampilkan jumlah favorit */}
-      <Text style={{ fontStyle: "italic", color: "gray" }}>
-        Tersimpan {daftarFavorit.length} kota
+      <Text style={styles.subjudul}>
+        Tersimpan {daftarKota.length} kota di perangkat (bisa dibuka offline)
       </Text>
 
-      {daftarFavorit.length === 0 && <Text>Belum ada kota favorit</Text>}
-      
-      {daftarFavorit.map((kota) => (
-        <View
-          key={kota.id}
-          style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
-        >
-          <Text>{kota.nama}</Text>
-          {/* Ubah onPress agar memanggil konfirmasiHapus, bukan hapus langsung */}
-          <Button title="Hapus" onPress={() => konfirmasiHapus(kota)} color="red" />
+      {daftarKota.length === 0 ? (
+        <View style={styles.kosongContainer}>
+          <Text style={styles.teksKosong}>Belum ada riwayat kota tersimpan.</Text>
         </View>
-      ))}
+      ) : (
+        <FlatList
+          data={daftarKota}
+          keyExtractor={(item) => item.kunci}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <TouchableOpacity style={{ flex: 1 }} onPress={() => bukaKota(item)}>
+                <Text style={styles.namaKota}>{item.nama}</Text>
+                <Text style={styles.infoWaktu}>
+                  Diperbarui: {new Date(item.disimpanPada).toLocaleString("id-ID")}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => konfirmasiHapus(item)}
+                style={styles.tombolHapus}
+              >
+                <Ionicons name="trash-outline" size={22} color="#ef4444" />
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, backgroundColor: "#f8fafc" },
+  judul: { fontSize: 20, fontWeight: "bold", marginBottom: 4, color: "#0f172a" },
+  subjudul: { fontSize: 13, fontStyle: "italic", color: "#64748b", marginBottom: 16 },
+  kosongContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  teksKosong: { color: "#64748b", fontSize: 14 },
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    padding: 14,
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  namaKota: { fontSize: 16, fontWeight: "600", color: "#1e293b" },
+  infoWaktu: { fontSize: 11, color: "#64748b", marginTop: 4 },
+  tombolHapus: { padding: 8 },
+});
