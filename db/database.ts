@@ -1,8 +1,8 @@
-//db/database.ts
+//src/db/database.ts
 import * as SQLite from "expo-sqlite";
 
 const NAMA_DATABASE = "jelajah-aman.db";
-const VERSI_DATABASE = 1;
+const VERSI_DATABASE = 2; // Diubah dari 1 menjadi 2 untuk migrasi versi 2
 
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
@@ -43,6 +43,14 @@ async function migrasiDatabase(db: SQLite.SQLiteDatabase): Promise<void> {
       );
     `);
     versiSaatIni = 1;
+  }
+
+  // Migrasi Versi 2: Menambahkan kolom jumlah_dibuka (Latihan Mandiri)
+  if (versiSaatIni < 2) {
+    await db.execAsync(
+      "ALTER TABLE cache_cuaca ADD COLUMN jumlah_dibuka INTEGER NOT NULL DEFAULT 0;"
+    );
+    versiSaatIni = 2;
   }
 
   await db.execAsync("PRAGMA user_version = " + VERSI_DATABASE);
